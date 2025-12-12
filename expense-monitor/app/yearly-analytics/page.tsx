@@ -6,7 +6,7 @@ type Monthly = { month: number; totalAmount: number };
 type Category = { category: string | null; totalAmount: number };
 
 async function fetchYearly(year?: number) {
-  const url = new URL(process.env.MONGODB_URI ?? "http://localhost:3000");
+  const url = new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000");
   url.pathname = "/api/analytics/yearly";
   if (year) url.searchParams.set("year", String(year));
   const res = await fetch(url.toString(), { cache: "no-store" });
@@ -15,7 +15,7 @@ async function fetchYearly(year?: number) {
 }
 
 async function fetchCategories(year?: number) {
-  const url = new URL(process.env.MONGODB_URI ?? "http://localhost:3000");
+  const url = new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000");
   url.pathname = "/api/analytics/yearly/categories";
   if (year) url.searchParams.set("year", String(year));
   const res = await fetch(url.toString(), { cache: "no-store" });
