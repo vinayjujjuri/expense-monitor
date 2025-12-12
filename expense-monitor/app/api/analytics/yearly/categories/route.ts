@@ -7,6 +7,7 @@ export async function GET(request: Request) {
   await connectDB();
 
   const url = new URL(request.url);
+  console.log("URL:", url.toString());
   const yearParam = url.searchParams.get("year");
   const year = yearParam ? Number(yearParam) : new Date().getFullYear();
 
