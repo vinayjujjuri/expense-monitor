@@ -8,7 +8,7 @@ export function DebitForm() {
   const [amount, setAmount] = useState<string>("")
   const [type, setType] = useState<DebitType>("Other Expenses")
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [success, setSuccess] = useState<string | null>(null)
 
   function validate(): boolean {
@@ -34,7 +34,7 @@ export function DebitForm() {
       const res = await fetch("/api/debit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: Number(amount), type }),
+        body: JSON.stringify({ amount: Number(amount), category: type }),
       })
       if (!res.ok) {
         const text = await res.text()
@@ -78,12 +78,12 @@ export function DebitForm() {
           onChange={(e) => setType(e.target.value as DebitType)}
           className="w-full rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
         >
-          <option value="Other Expenses">Office travel</option>
+          <option value="Other Expenses">Other Expenses</option>
           <option value="Recharges/Bills">Recharges/Bills</option>
-          <option value="Office travel">Other Expenses</option>
+          <option value="Office travel">Office travel</option>
           <option value="Fast food">Fast food</option>
-          <option value="Fast food">Offline Shopping/Online Shopping</option>
-          <option value="Fast food">EMI</option>
+          <option value="Offline Shopping/Online Shopping">Offline Shopping/Online Shopping</option>
+          <option value="EMI">EMI</option>
         </select>
       </div>
 

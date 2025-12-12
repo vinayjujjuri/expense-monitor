@@ -34,7 +34,7 @@ export function CreditForm() {
             const res = await fetch("/api/credit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: Number(amount), type }),
+                body: JSON.stringify({ amount: Number(amount), creditType: type }),
             })
             if (!res.ok) {
                 const text = await res.text()
