@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import MonthlyPieChart from "@/components/analytics/monthly-chart";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center font-roboto">
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+  <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <Link
             href="/add-credit"
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-emerald-600 text-white px-5 transition-colors hover:bg-emerald-700 md:w-[158px]"
@@ -34,6 +35,9 @@ export default function Home() {
             />
             Deploy Now ( vercel )
           </a>
+        </div>
+        <div className="w-full max-w-3xl mt-8">
+          <MonthlyPieChart />
         </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-type CreditType = "salary"
+type CreditType = "salary" | "other"
 
 export function CreditForm() {
     const [amount, setAmount] = useState<string>("")
@@ -79,6 +79,7 @@ export function CreditForm() {
                     className="w-full rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                     <option value="salary">Salary</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
 
