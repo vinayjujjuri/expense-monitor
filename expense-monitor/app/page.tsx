@@ -1,51 +1,22 @@
-import Image from "next/image";
-import Link from "next/link";
 import MonthlyPieChart from "@/components/analytics/monthly-chart";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center font-roboto">
-  <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <Link
-            href="/add-credit"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-emerald-600 text-white px-5 transition-colors hover:bg-emerald-700 md:w-[158px]"
-          >
-            Add credit amount
-          </Link>
-
-          <Link
-            href="/add-debit"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-rose-600 text-white px-5 transition-colors hover:bg-rose-700 md:w-[158px]"
-          >
-            Add debit amount
-          </Link>
-
-          <Link
-            href="/yearly-analytics"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-sky-600 text-white px-5 transition-colors hover:bg-sky-700 md:w-[158px]"
-          >
-            Yearly analytics
-          </Link>
-
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now ( vercel )
-          </a>
+    <div className="flex flex-col items-center gap-8 font-roboto">
+      <section className="w-full rounded-lg bg-white shadow-sm dark:bg-slate-800 border border-gray-100 dark:border-gray-800 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Welcome back</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Quick overview of this month's expenses</p>
+          </div>
         </div>
-        <div className="w-full max-w-3xl mt-8">
-          <MonthlyPieChart />
+
+        <div className="mt-6 w-full">
+          <div className="w-full rounded-md bg-white/50 p-4 dark:bg-transparent">
+            <MonthlyPieChart />
+          </div>
         </div>
+      </section>
     </div>
   );
 }

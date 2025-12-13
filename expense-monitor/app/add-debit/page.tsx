@@ -1,5 +1,4 @@
 import { DebitForm } from '@/components/debit-form';
-import React from 'react';
 
 const AddDebitPage = () => {
     return (
