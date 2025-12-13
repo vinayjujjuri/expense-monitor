@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -11,7 +12,10 @@ export default function Navbar() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-lg font-semibold tracking-tight">Expense Monitor</Link>
+            <Link href="/" className="inline-flex items-center gap-3">
+              <img src="/icon_exp_trac.png" alt="Expense Monitor logo" width={35} height={35} className="rounded" />
+              <span className="text-lg font-semibold tracking-tight">Expense Monitor</span>
+            </Link>
             <span className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400">Track credits & debits</span>
           </div>
 
