@@ -1,48 +1,97 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+
+const menu = [
+  { label: "New User", href: "/user-register" },
+  { label: "Add Credit", href: "/add-credit" },
+  { label: "Add Debit", href: "/add-debit" },
+  { label: "Yearly Analytics", href: "/yearly-analytics" },
+  { label: "Admin", href: "/admin/users", admin: true },
+];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="w-full bg-white/60 dark:bg-black/60 backdrop-blur sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-black/60">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="inline-flex items-center gap-3">
-              <img src="/icon_exp_trac.png" alt="Expense Monitor logo" width={35} height={35} className="rounded" />
-              <span className="text-lg font-semibold tracking-tight">Expense Monitor</span>
-            </Link>
-            <span className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400">Track credits & debits</span>
-          </div>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3">
+            <img
+              src="/icon_exp_trac.png"
+              alt="Expense Monitor"
+              width={35}
+              height={35}
+              className="rounded"
+            />
+            <span className="text-lg font-semibold">Expense Monitor</span>
+          </Link>
 
-          <nav className="hidden md:flex items-center gap-3">
-            <Link href="/add-credit" className="inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Add credit</Link>
-            <Link href="/add-debit" className="inline-flex items-center rounded-full bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700">Add debit</Link>
-            <Link href="/yearly-analytics" className="inline-flex items-center rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">Yearly</Link>
-            <a href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90">Deploy</a>
+          {/* Desktop Menu */}
+          <nav className="hidden md:flex items-center gap-1">
+            {menu.map((item) => {
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`rounded-md px-3 py-2 text-sm font-medium transition
+                    ${
+                      isActive
+                        ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                    }
+                    ${
+                      item.admin
+                        ? "ml-2 border border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300"
+                        : ""
+                    }
+                  `}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="md:hidden">
-            <button onClick={() => setOpen(!open)} aria-label="Toggle menu" className="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-              <svg className={`h-6 w-6 transition-transform ${open ? "rotate-90" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 12h18M3 6h18M3 18h18" />
-              </svg>
-            </button>
-          </div>
+          {/* Mobile Toggle */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {open && (
         <div className="md:hidden border-t border-gray-200 dark:border-gray-800">
-          <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 lg:px-8 flex flex-col gap-2">
-            <Link href="/add-credit" onClick={() => setOpen(false)} className="w-full rounded-md bg-emerald-600 px-4 py-2 text-center text-white">Add credit</Link>
-            <Link href="/add-debit" onClick={() => setOpen(false)} className="w-full rounded-md bg-rose-600 px-4 py-2 text-center text-white">Add debit</Link>
-            <Link href="/yearly-analytics" onClick={() => setOpen(false)} className="w-full rounded-md bg-sky-600 px-4 py-2 text-center text-white">Yearly analytics</Link>
-            <a href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app" target="_blank" rel="noreferrer" className="w-full rounded-md bg-gray-900 px-4 py-2 text-center text-white">Deploy</a>
+          <div className="space-y-1 px-4 py-3">
+            {menu.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="block rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       )}

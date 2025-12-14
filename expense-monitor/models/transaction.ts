@@ -1,8 +1,8 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import { DEBIT_CATEGORIES } from "@/utils/constants";
 
 export interface ITransaction extends Document {
-  userId?: string;               // Optional for now
+  userId?: string | Types.ObjectId;
   amount: number;
   type: "credit" | "debit";
   creditType?: "salary" | null;  // Only for credit
@@ -14,8 +14,9 @@ export interface ITransaction extends Document {
 const TransactionSchema: Schema<ITransaction> = new Schema(
   {
     userId: {
-      type: String,
-      required: false, // add auth later
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     amount: {
       type: Number,

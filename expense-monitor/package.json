@@ -10,10 +10,12 @@
     "test-db": "node scripts/test-db.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "date-fns": "^2.30.0",
     "mongoose": "^9.0.1",
     "next": "16.0.10",
+    "next-auth": "^4.24.13",
     "react": "19.2.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.1"

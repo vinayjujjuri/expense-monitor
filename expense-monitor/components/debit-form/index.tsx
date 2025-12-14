@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Dropdown from "../../app/components/dropdown"
+import Dropdown from "../dropdown"
 
 type DebitType = "Other Expenses" | "Recharges/Bills" | "Office travel" | "Fast food" | "EMI" | "Offline Shopping/Online Shopping"
 
