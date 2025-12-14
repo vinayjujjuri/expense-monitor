@@ -4,12 +4,12 @@ import User from "@/models/User";
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const { id } = context.params;
+    const { id } = await context.params;
 
     const user = await User.findByIdAndUpdate(
       id,
