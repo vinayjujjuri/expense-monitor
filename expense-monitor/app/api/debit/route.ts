@@ -25,13 +25,13 @@ export async function POST(request: Request) {
 	try {
 			await connectDB();
 
-			const session = await getServerSession(authOptions as any);
-			if (!session || !(session as any).user) {
-				return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-			}
+			// const session = await getServerSession(authOptions as any);
+			// if (!session || !(session as any).user) {
+			// 	return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+			// }
 
 			const doc = new Transaction({
-				userId: (session as any).user.id,
+				// userId: (session as any).user.id,
 				amount,
 				type: 'debit',
 				category: category ?? null,
