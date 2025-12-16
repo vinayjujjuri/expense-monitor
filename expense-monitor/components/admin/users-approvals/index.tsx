@@ -13,6 +13,8 @@ export default function AdminUsersApprovals() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
+
 
   const fetchPendingUsers = async () => {
     try {
@@ -32,12 +34,25 @@ export default function AdminUsersApprovals() {
   }, []);
 
   const updateStatus = async (id: string, action: "approve" | "reject") => {
-    await fetch(`/api/admin/users/${id}/${action}`, {
-      method: "PATCH",
-    });
+    try {
+      const res = await fetch(`/api/admin/users/${id}/${action}`, {
+        method: "PATCH",
+      });
 
-    setUsers((prev) => prev.filter((user) => user._id !== id));
+      if (!res.ok) {
+        throw new Error("Failed to update user status");
+      }
+
+      // 🔄 Re-fetch latest pending users
+      setLoading(true);
+      await fetchPendingUsers();
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   if (loading)
     return (
@@ -101,6 +116,7 @@ export default function AdminUsersApprovals() {
                     onClick={() =>
                       updateStatus(user._id, "approve")
                     }
+                    disabled={actionLoading}
                     className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-green-700"
                   >
                     Approve
@@ -110,6 +126,7 @@ export default function AdminUsersApprovals() {
                     onClick={() =>
                       updateStatus(user._id, "reject")
                     }
+                    disabled={actionLoading}
                     className="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-red-700"
                   >
                     Reject

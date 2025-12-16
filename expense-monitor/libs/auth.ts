@@ -19,7 +19,7 @@ export const authOptions = {
         if (!user) return null;
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return null;
-        return { id: user._id.toString(), email: user.email, role: user.role } as any;
+        return { id: user._id.toString(), email: user.email,name: user.name, role: user.role } as any;
       },
     }),
   ],
@@ -29,12 +29,13 @@ export const authOptions = {
       if (user) {
         token.id = user.id ?? user._id;
         token.role = user.role;
+        token.name = user.name;
         token.email = user.email;
       }
       return token;
     },
     async session({ session, token }: any) {
-      session.user = { email: token.email, role: token.role } as any;
+      session.user = { email: token.email,name: token.name, role: token.role } as any;
       (session.user as any).id = token.id;
       return session;
     },

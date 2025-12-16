@@ -12,12 +12,12 @@ export default function RegisterForm() {
     password: "",
   });
 
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [emailVerified, setEmailVerified] = useState(false);
+  // 🔕 OTP states (disabled for now)
+  // const [otp, setOtp] = useState("");
+  // const [otpSent, setOtpSent] = useState(false);
+  // const [emailVerified, setEmailVerified] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [otpLoading, setOtpLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -25,76 +25,16 @@ export default function RegisterForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 📩 Send OTP
-  const sendOtp = async () => {
-    if (!form.email) {
-      setError("Please enter email");
-      return;
-    }
-
-    setOtpLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const res = await fetch("/api/auth/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      setOtpSent(true);
-      setSuccess("OTP sent to your email");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  // ✅ Verify OTP
-  const verifyOtp = async () => {
-    if (!otp) {
-      setError("Please enter OTP");
-      return;
-    }
-
-    setOtpLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, otp }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      setEmailVerified(true);
-      setSuccess("Email verified successfully ✅");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  // 🧾 Register user
+  // 🧾 Register user directly (NO OTP)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailVerified) return;
 
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/user-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -105,9 +45,6 @@ export default function RegisterForm() {
 
       setSuccess("Registration submitted. Await admin approval.");
       setForm({ name: "", email: "", password: "" });
-      setOtp("");
-      setOtpSent(false);
-      setEmailVerified(false);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -123,7 +60,7 @@ export default function RegisterForm() {
             Create Account ✨
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Verify email before registration
+            Registration requires admin approval
           </p>
         </div>
 
@@ -145,72 +82,38 @@ export default function RegisterForm() {
             type="text"
             name="name"
             placeholder="Your name"
+            required
             value={form.name}
             onChange={handleChange}
             className="w-full rounded-lg border px-3 py-2"
           />
 
-          {/* Email + OTP */}
-          <div className="space-y-2">
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              disabled={otpSent}
-              className="w-full rounded-lg border px-3 py-2 disabled:bg-gray-100"
-            />
-
-            {!emailVerified && (
-              <button
-                type="button"
-                onClick={sendOtp}
-                disabled={otpLoading || otpSent}
-                className="w-full rounded-lg bg-sky-600 py-2 text-white hover:bg-sky-700 disabled:opacity-60"
-              >
-                {otpLoading ? "Sending OTP..." : "Send OTP"}
-              </button>
-            )}
-          </div>
-
-          {/* OTP Verification */}
-          {otpSent && !emailVerified && (
-            <div className="space-y-2">
-              <input
-                type="text"
-                placeholder="Enter 6-digit OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-
-              <button
-                type="button"
-                onClick={verifyOtp}
-                disabled={otpLoading}
-                className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700"
-              >
-                Verify OTP
-              </button>
-            </div>
-          )}
+          {/* Email */}
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            value={form.email}
+            onChange={handleChange}
+            className="w-full rounded-lg border px-3 py-2"
+          />
 
           {/* Password */}
           <input
             type="password"
             name="password"
             placeholder="Create password"
+            required
             value={form.password}
             onChange={handleChange}
-            disabled={!emailVerified}
-            className="w-full rounded-lg border px-3 py-2 disabled:bg-gray-100"
+            className="w-full rounded-lg border px-3 py-2"
           />
 
           {/* Submit */}
           <button
             type="submit"
-            disabled={!emailVerified || loading}
+            disabled={loading}
             className="w-full rounded-lg bg-teal-600 py-2 text-white hover:bg-teal-700 disabled:opacity-50"
           >
             {loading ? "Creating account..." : "Register"}
