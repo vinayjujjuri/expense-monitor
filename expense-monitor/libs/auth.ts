@@ -12,14 +12,18 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
-        if (!credentials) return null;
+        if (!credentials) throw new Error("Missing credentials");
         await connectDB();
         const { email, password } = credentials as { email: string; password: string };
         const user = await User.findOne({ email }).exec();
-        if (!user) return null;
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
         const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) return null;
-        return { id: user._id.toString(), email: user.email,name: user.name, role: user.role } as any;
+        if (!isValid) {
+          throw new Error("Incorrect password");
+        }
+        return { id: user._id.toString(), email: user.email, name: user.name, role: user.role } as any;
       },
     }),
   ],

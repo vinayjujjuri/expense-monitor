@@ -4,9 +4,18 @@ import Transaction from '../../../models/transaction';
 import { getServerSession } from 'next-auth/next';
 import authOptions from '@/libs/auth';
 
-export async function GET(request: Request) {
-	return NextResponse.json({ message: 'GET /api/debit' });
-}
+	export async function GET() {
+		await connectDB();
+		const session = await getServerSession(authOptions as any);
+		if (!session || !(session as any).user) {
+			return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+		}
+		const userId = (session as any).user.id;
+		// Fetch all debits for the logged-in user
+		const debits = await Transaction.find({ userId, type: 'debit' }).sort({ transactionDate: -1 });
+		return NextResponse.json({ debits });
+	}
+
 
 // Expected body: { amount: number, category?: string, transactionDate?: string }
 export async function POST(request: Request) {
@@ -23,20 +32,20 @@ export async function POST(request: Request) {
 	}
 
 	try {
-			await connectDB();
+		await connectDB();
+		const session = await getServerSession(authOptions as any);
+		if (!session || !(session as any).user) {
+			return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+		}
+		const userId = (session as any).user.id;
 
-			// const session = await getServerSession(authOptions as any);
-			// if (!session || !(session as any).user) {
-			// 	return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-			// }
-
-			const doc = new Transaction({
-				// userId: (session as any).user.id,
-				amount,
-				type: 'debit',
-				category: category ?? null,
-				transactionDate: transactionDate ? new Date(transactionDate) : undefined,
-			});
+		const doc = new Transaction({
+			userId,
+			amount,
+			type: 'debit',
+			category: category ?? null,
+			transactionDate: transactionDate ? new Date(transactionDate) : undefined,
+		});
 
 		const saved = await doc.save();
 

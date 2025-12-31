@@ -38,6 +38,7 @@ export function CreditForm() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount: Number(amount), creditType: type }),
+                credentials: "include"
             })
             if (!res.ok) {
                 const text = await res.text()
@@ -80,7 +81,7 @@ export function CreditForm() {
     }, [])
 
     return (
-        <form onSubmit={handleSubmit} aria-label="credit-form" className="w-full max-w-lg mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+        <form onSubmit={handleSubmit} aria-label="credit-form" className="w-full max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
             <div className="flex items-start gap-3 mb-4">
                 <div className="flex-shrink-0">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-emerald-600">
@@ -90,14 +91,14 @@ export function CreditForm() {
                     </svg>
                 </div>
                 <div>
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Add Credit</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Record incoming money — salaries or other credits.</p>
+                    <h2 className="text-2xl font-semibold text-gray-900">Add Credit</h2>
+                    <p className="text-sm text-gray-500">Record incoming money — salaries or other credits.</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
                 <div>
-                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
+                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₹</span>
                         <input
@@ -110,13 +111,13 @@ export function CreditForm() {
                             onChange={(e) => { setAmount(e.target.value); clearSuccess(); }}
                             placeholder="0.00"
                             required
-                            className="w-full rounded-md border border-gray-200 dark:border-gray-700 px-10 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="w-full rounded-md border border-gray-200 px-10 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Type</label>
+                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Credit Type</label>
                     <Dropdown
                         id="type"
                         options={[{ label: 'Salary', value: 'salary' }, { label: 'Other', value: 'other' }]}
@@ -124,7 +125,7 @@ export function CreditForm() {
                         onChange={(v: any) => { setType(v as CreditType); clearSuccess(); }}
                         placeholder="Select type"
                         className="w-full"
-                        buttonClassName="w-full rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-left"
+                        buttonClassName="w-full rounded-md border border-gray-200 px-3 py-2 bg-white text-gray-900 text-left"
                         listStyle={{ minWidth: '100%' }}
                     />
                 </div>
@@ -162,8 +163,8 @@ export function CreditForm() {
                         </span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">{success}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Saved to your transactions</span>
+                        <span className="text-sm font-medium text-emerald-700">{success}</span>
+                        <span className="text-xs text-gray-500">Saved to your transactions</span>
                     </div>
                 </div>
             )}

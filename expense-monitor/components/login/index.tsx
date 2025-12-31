@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +28,17 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res?.error) {
-      setError(res.error);
+      // Custom error for not approved users
+      const err = res.error.toLowerCase();
+      if (err.includes("pending")) {
+        setError("Your account is pending approval by admin.");
+      } else if (err.includes("no user")) {
+        setError("No user found with this email.");
+      } else if (err.includes("incorrect password")) {
+        setError("Incorrect password.");
+      } else {
+        setError(res.error);
+      }
       return;
     }
 
@@ -45,6 +56,9 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-gray-600">
             Login to track and manage your expenses
           </p>
+          {session?.user?.name && (
+            <div className="mt-2 text-teal-700 text-sm">Logged in as: <b>{session.user.name}</b></div>
+          )}
         </div>
 
         {/* Error */}

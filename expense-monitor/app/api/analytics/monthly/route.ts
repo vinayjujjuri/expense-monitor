@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
+import { getServerSession } from 'next-auth/next';
+import authOptions from '@/libs/auth';
 
 export async function GET(_req: NextRequest) {
   const now = new Date();
@@ -11,10 +13,15 @@ export async function GET(_req: NextRequest) {
 
   try {
     await connectDB();
-
+    const session = await getServerSession(authOptions as any);
+    if (!session || !(session as any).user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const userId = (session as any).user.id;
     const aggregation = await Transaction.aggregate([
       {
         $match: {
+          userId: typeof userId === 'string' ? new (require('mongoose')).Types.ObjectId(userId) : userId,
           type: "debit",
           createdAt: { $gte: start, $lte: end },
           category: { $ne: null },
@@ -34,18 +41,14 @@ export async function GET(_req: NextRequest) {
     const categories = aggregation?.[0]?.categories ?? [];
     const totalSpent = aggregation?.[0]?.totalSpent?.[0]?.totalAmount ?? 0;
 
-  const payload = {
+    const payload = {
       month: start.getMonth() + 1,
       year: start.getFullYear(),
       totalSpent,
       categories,
     };
 
-  // Log the payload for debugging/inspection
-  // eslint-disable-next-line no-console
-  console.log("monthly analytics payload:", JSON.stringify(payload));
-
-  return NextResponse.json(payload);
+    return NextResponse.json(payload);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("monthly analytics error:", error);

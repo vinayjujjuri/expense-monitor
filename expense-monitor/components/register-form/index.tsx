@@ -78,10 +78,13 @@ export default function RegisterForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+              Name
+            </label>
           <input
             type="text"
             name="name"
-            placeholder="Your name"
+            placeholder="Enter your full name"
             required
             value={form.name}
             onChange={handleChange}
@@ -89,10 +92,13 @@ export default function RegisterForm() {
           />
 
           {/* Email */}
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+              Email
+            </label>
           <input
             type="email"
             name="email"
-            placeholder="you@example.com"
+            placeholder="Enter your email"
             required
             value={form.email}
             onChange={handleChange}
@@ -100,10 +106,13 @@ export default function RegisterForm() {
           />
 
           {/* Password */}
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+              Password
+            </label>
           <input
             type="password"
             name="password"
-            placeholder="Create password"
+            placeholder="Enter a secure password"
             required
             value={form.password}
             onChange={handleChange}

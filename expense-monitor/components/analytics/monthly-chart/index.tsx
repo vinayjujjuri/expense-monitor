@@ -44,7 +44,7 @@ export default function MonthlyPieChart() {
   if (!categories || categories.length === 0) {
     return (
       <div className="p-4">
-        <p className="text-sm text-gray-600 dark:text-gray-300">No debit categories with amounts for this month.</p>
+        <p className="text-sm text-gray-600">No debit categories with amounts for this month.</p>
         <p className="mt-2 text-xs text-gray-500">Total spent: {total}</p>
       </div>
     )
@@ -74,10 +74,10 @@ export default function MonthlyPieChart() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Monthly spending</h3>
+    <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-sm">
+      <h3 className="text-lg font-medium text-gray-900 mb-3">Monthly spending</h3>
       <Pie data={chartData} />
-      <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">Total spent: {total}</p>
+      <p className="mt-3 text-sm text-gray-600">Total spent: {total}</p>
     </div>
   )
 }
