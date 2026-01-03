@@ -82,7 +82,7 @@ export default function WeeklyBarChart() {
                 "rgba(168, 85, 247, 0.9)",
                 "rgba(34, 197, 94, 0.9)",
               ],
-              borderRadius: 8,
+              borderRadius: 6,
               barThickness: 40,
             },
           ],
@@ -104,6 +104,12 @@ export default function WeeklyBarChart() {
               title: {
                 display: true,
                 text: "Credit Amount (Reference)",
+              },
+            },
+             x: {
+              title: {
+                display: true,
+                text: "Weekly Debit Amount",
               },
             },
           },
