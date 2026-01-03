@@ -2,8 +2,14 @@
 
 import { useEffect, useRef, useState } from "react"
 import Dropdown from "../dropdown"
+import { toTitleCase } from "@/utils/format"
 
 type DebitType = "Other Expenses" | "Recharges/Bills" | "Office travel" | "Fast food" | "EMI" | "Offline Shopping/Online Shopping"
+
+interface DebitCategory {
+  _id: string
+  name: string
+}
 
 export function DebitForm() {
   const [amount, setAmount] = useState<string>("")
@@ -13,6 +19,25 @@ export function DebitForm() {
   const [success, setSuccess] = useState<string | null>(null)
   const successTimerRef = useRef<number | null>(null)
   const amountRef = useRef<HTMLInputElement | null>(null)
+  const [categories, setCategories] = useState<DebitCategory[]>([])
+  const [categoryId, setCategoryId] = useState<string>("")
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/debit-categories", {
+          credentials: "include",
+        })
+        if (!res.ok) throw new Error("Failed to load categories")
+        const data = await res.json()
+        setCategories(data)
+        if (data.length) setCategoryId(data[0]._id)
+      } catch (err: any) {
+        setError(err.message)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   function validate(): boolean {
     setError(null)
@@ -37,7 +62,7 @@ export function DebitForm() {
       const res = await fetch("/api/debit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: Number(amount), category: type }),
+        body: JSON.stringify({ amount: Number(amount), categoryId: categoryId }),
         credentials: "include"
       })
       if (!res.ok) {
@@ -83,7 +108,7 @@ export function DebitForm() {
         <div className="flex-shrink-0">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-rose-600">
             <path d="M6 12h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            <rect x="2" y="3" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+            <rect x="2" y="3" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="1.2" />
           </svg>
         </div>
         <div>
@@ -112,31 +137,47 @@ export function DebitForm() {
           </div>
         </div>
 
-        <div>
+        {categories.length === 0 ?
+          <div className="rounded-lg border border-dashed border-rose-300 bg-rose-50 p-4">
+            <p className="text-sm text-rose-700 font-medium">
+              No debit types found
+            </p>
+            <p className="mt-1 text-xs text-gray-600">
+              You need at least one debit type before adding expenses.
+            </p>
+
+            <a
+              href="/manage-debit-types"
+              className="mt-3 inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+            >
+              ➕ Add Debit Type
+            </a>
+          </div> :
+          <div>
           <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Debit Type</label>
           <Dropdown
             id="type"
-            options={[
-              { label: 'Other Expenses', value: 'Other Expenses' },
-              { label: 'Recharges/Bills', value: 'Recharges/Bills' },
-              { label: 'Office travel', value: 'Office travel' },
-              { label: 'Fast food', value: 'Fast food' },
-              { label: 'Offline Shopping/Online Shopping', value: 'Offline Shopping/Online Shopping' },
-              { label: 'EMI', value: 'EMI' },
-            ]}
-            value={type}
-            onChange={(v: any) => { setType(v as DebitType); clearSuccess(); }}
+            options={categories.map(cat => ({
+              label: toTitleCase(cat.name),
+              value: cat._id,
+            }))}
+            value={categoryId}
+            onChange={(v: any) => setCategoryId(v)}
             placeholder="Select category"
             className="w-full"
             buttonClassName="w-full rounded-md border border-gray-200 px-3 py-2 bg-white text-gray-900 text-left"
             listStyle={{ minWidth: '100%' }}
           />
         </div>
+        }
+
+
+        
 
         <div className="flex items-center justify-end">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || categories.length === 0}
             className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md disabled:opacity-60"
           >
             {loading ? (

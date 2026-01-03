@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 		return NextResponse.json({ message: 'POST /api/debit - invalid or missing JSON body' }, { status: 400 });
 	}
 
-	const { amount, category, transactionDate } = body || {};
+	const { amount, categoryId, transactionDate } = body || {};
 	if (typeof amount !== 'number' || Number.isNaN(amount)) {
 		return NextResponse.json({ message: 'Invalid amount' }, { status: 400 });
 	}
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 			userId,
 			amount,
 			type: 'debit',
-			category: category ?? null,
+			categoryId: categoryId ?? null,
 			transactionDate: transactionDate ? new Date(transactionDate) : undefined,
 		});
 

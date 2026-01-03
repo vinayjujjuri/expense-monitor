@@ -49,7 +49,7 @@ export default function WeeklyBarChart() {
 
   const renderChartData = () => {
     if (loading) {
-      return <p className="text-center text-gray-500">Loading chart...</p>;
+      return <p className="text-center text-gray-500">Loading data...</p>;
     }
 
     if (weeklyDebit.every((amount) => amount === 0)) {
@@ -66,7 +66,7 @@ export default function WeeklyBarChart() {
           labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
           datasets: [
             {
-              label: "Weekly Debit",
+              label: "Weekly Expenses",
               data: weeklyDebit,
               backgroundColor: [
                 "rgba(20, 184, 166, 0.7)", // teal
