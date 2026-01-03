@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { NextResponse } from "next/server";
 import { startOfYear, endOfYear } from "date-fns";
 import mongoose from "mongoose";

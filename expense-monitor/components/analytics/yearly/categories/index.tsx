@@ -3,6 +3,7 @@
 import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { toTitleCase } from "@/utils/format";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -15,7 +16,7 @@ function randomPastelColor(seed: number) {
 }
 
 export default function YearlyCategoryPieChart({ categories }: { categories: Category[] }) {
-  const labels = categories.map((c) => c.category ?? "Uncategorized");
+  const labels = categories.map((c) => toTitleCase(c.category ?? "") ?? "Uncategorized");
   const dataValues = categories.map((c) => c.totalAmount);
   const backgroundColor = categories.map((_, i) => randomPastelColor(i + 1));
 

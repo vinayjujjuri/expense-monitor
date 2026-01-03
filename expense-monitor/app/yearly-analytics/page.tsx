@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import React from "react";
 import YearlyLineChart from "@/components/analytics/yearly";
 import YearlyCategoryPieChart from "@/components/analytics/yearly/categories";
