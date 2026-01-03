@@ -5,6 +5,7 @@ import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
 import { getServerSession } from 'next-auth/next';
 import authOptions from '@/libs/auth';
+import mongoose from "mongoose";
 
 export async function GET(_req: NextRequest) {
   const now = new Date();
@@ -21,7 +22,7 @@ export async function GET(_req: NextRequest) {
     const aggregation = await Transaction.aggregate([
       {
         $match: {
-          userId: typeof userId === 'string' ? new (require('mongoose')).Types.ObjectId(userId) : userId,
+          userId: typeof userId === 'string' ? new mongoose.Types.ObjectId(userId) : userId,
           type: "debit",
           createdAt: { $gte: start, $lte: end },
           category: { $ne: null },

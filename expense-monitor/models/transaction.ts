@@ -5,7 +5,7 @@ export interface ITransaction extends Document {
   userId?: string | Types.ObjectId;
   amount: number;
   type: "credit" | "debit";
-  creditType?: "salary" | null;  // Only for credit
+  creditType?: "salary" | "other" | null;
   category?: string | null;      // Only for debit
   createdAt: Date;
   transactionDate: Date;         // The date of the transaction (defaults to now)
@@ -32,7 +32,7 @@ const TransactionSchema: Schema<ITransaction> = new Schema(
     // Only for credits
     creditType: {
       type: String,
-      enum: ["salary", null],
+      enum: ["salary", "other", null],
       default: null,
     },
 
