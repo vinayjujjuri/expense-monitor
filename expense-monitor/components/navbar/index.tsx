@@ -16,10 +16,19 @@ declare module "next-auth" {
 
 const menu = [
   { label: "New User", href: "/user-register", public: true },
+
+  {
+    label: "Daily Expenses",
+    href: "/daily-expenses-entries",
+    highlight: true,
+  },
+
   { label: "Add Credit", href: "/add-credit" },
   { label: "Add Debit", href: "/add-debit" },
+
   { label: "Weekly Report", href: "/weekly-report" },
   { label: "Yearly Report", href: "/yearly-analytics" },
+
   { label: "Admin", href: "/admin/users", admin: true },
 ];
 
@@ -58,16 +67,18 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-1">
             {filteredMenu.map((item) => {
               const isActive = pathname === item.href;
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition
+                  className={`relative flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition
                     ${
                       isActive
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }
+                    
                     ${
                       item.admin
                         ? "ml-2 border border-violet-200 text-teal-600 hover:bg-violet-50"
@@ -75,6 +86,19 @@ export default function Navbar() {
                     }
                   `}
                 >
+                  {/* Icon for Daily Expenses */}
+                  {item.highlight && (
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 3" />
+                    </svg>
+                  )}
                   {item.label}
                 </Link>
               );
@@ -121,11 +145,16 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`block rounded-md px-3 py-2 text-sm font-medium transition
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition
                   ${
                     pathname === item.href
                       ? "bg-teal-50 text-teal-700"
                       : "text-gray-700 hover:bg-gray-100"
+                  }
+                  ${
+                    item.highlight
+                      ? "bg-rose-50 text-rose-700"
+                      : ""
                   }
                   ${
                     item.admin
@@ -134,6 +163,18 @@ export default function Navbar() {
                   }
                 `}
               >
+                {item.highlight && (
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 3" />
+                  </svg>
+                )}
                 {item.label}
               </Link>
             ))}

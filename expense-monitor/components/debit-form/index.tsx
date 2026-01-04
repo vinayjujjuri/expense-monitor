@@ -102,6 +102,33 @@ export function DebitForm() {
     }
   }, [])
 
+  const successComponent = () => {
+    if(!success) return null
+    return (
+      <div role="status" className="mt-3 flex items-center gap-3">
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <span className="absolute inline-flex h-8 w-8 rounded-full bg-rose-500 opacity-75 animate-ping" aria-hidden="true"></span>
+            <span className="relative inline-flex rounded-full bg-rose-600 w-8 h-8 items-center justify-center text-white">
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 6L8.5 13.5L4 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-rose-700">{success}</span>
+            <span className="text-xs text-gray-500">Saved to your transactions</span>
+          </div>
+        </div>
+    )
+  };
+
+  const errorComponent = () => {
+    if(!error) return null
+    return (
+      <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>
+    )
+  };
+
   return (
     <form onSubmit={handleSubmit} aria-label="debit-form" className="w-full max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
       <div className="flex items-start gap-3 mb-4">
@@ -167,13 +194,24 @@ export function DebitForm() {
             className="w-full"
             buttonClassName="w-full rounded-md border border-gray-200 px-3 py-2 bg-white text-gray-900 text-left"
             listStyle={{ minWidth: '100%' }}
+            searchable={true}
+            searchPlaceholder="Search for your Debit type"
+            emptyState={
+              <div className="flex flex-col gap-2 p-2">
+                  <p className="text-sm text-gray-600">
+                    No debit type found
+                  </p>
+                  <a
+                    href="/manage-debit-types"
+                    className="inline-flex items-center justify-center gap-2 rounded-md bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
+                  >
+                    ➕ Add Debit Type
+                  </a>
+              </div>
+            }
           />
         </div>
         }
-
-
-        
-
         <div className="flex items-center justify-end">
           <button
             type="submit"
@@ -195,23 +233,8 @@ export function DebitForm() {
         </div>
       </div>
 
-      {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
-      {success && (
-        <div role="status" className="mt-3 flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-8 h-8">
-            <span className="absolute inline-flex h-8 w-8 rounded-full bg-rose-500 opacity-75 animate-ping" aria-hidden="true"></span>
-            <span className="relative inline-flex rounded-full bg-rose-600 w-8 h-8 items-center justify-center text-white">
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 6L8.5 13.5L4 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-rose-700">{success}</span>
-            <span className="text-xs text-gray-500">Saved to your transactions</span>
-          </div>
-        </div>
-      )}
+      {errorComponent()}
+      {successComponent()}
     </form>
   )
 }
