@@ -26,11 +26,22 @@ const menu = [
   { label: "Add Credit", href: "/add-credit" },
   { label: "Add Debit", href: "/add-debit" },
 
+  {
+    label: "UPI",
+    children: [
+      {
+        label: "Upload Statement",
+        href: "/upi/upload-phonePe-transactions",
+      },
+    ],
+  },
+
   { label: "Weekly Report", href: "/weekly-report" },
   { label: "Yearly Report", href: "/yearly-analytics" },
 
   { label: "Admin", href: "/admin/users", admin: true },
 ];
+
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -40,10 +51,10 @@ export default function Navbar() {
   const filteredMenu = !session?.user
     ? menu.filter((item) => item.public)
     : menu.filter((item) => {
-        if (item.public) return false;
-        if (!item.admin) return true;
-        return session.user?.role === "admin";
-      });
+      if (item.public) return false;
+      if (!item.admin) return true;
+      return session.user?.role === "admin";
+    });
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white/80 backdrop-blur">
@@ -66,6 +77,54 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <nav className="hidden md:flex items-center gap-1">
             {filteredMenu.map((item) => {
+              // 🔹 Parent with children
+              if ("children" in item && item.children) {
+                const isParentActive = item.children.some(
+                  (child) => pathname === child.href
+                );
+
+                return (
+                  <div key={item.label} className="relative group">
+                    <button
+                      className={`flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition
+              ${isParentActive
+                          ? "bg-teal-50 text-teal-700"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        }`}
+                    >
+                      {item.label}
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+
+                    {/* Dropdown */}
+                    <div className="absolute left-0 mt-1 hidden w-48 rounded-md border border-gray-200 bg-white shadow-md group-hover:block">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={`block px-4 py-2 text-sm transition
+                  ${pathname === child.href
+                              ? "bg-teal-50 text-teal-700"
+                              : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              // 🔹 Normal menu item
               const isActive = pathname === item.href;
 
               return (
@@ -73,20 +132,16 @@ export default function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={`relative flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition
-                    ${
-                      isActive
-                        ? "bg-teal-50 text-teal-700"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+          ${isActive
+                      ? "bg-teal-50 text-teal-700"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }
-                    
-                    ${
-                      item.admin
-                        ? "ml-2 border border-violet-200 text-teal-600 hover:bg-violet-50"
-                        : ""
+          ${item.admin
+                      ? "ml-2 border border-violet-200 text-teal-600 hover:bg-violet-50"
+                      : ""
                     }
-                  `}
+        `}
                 >
-                  {/* Icon for Daily Expenses */}
                   {item.highlight && (
                     <svg
                       className="h-4 w-4"
@@ -114,6 +169,7 @@ export default function Navbar() {
             )}
           </nav>
 
+
           {/* Mobile Toggle */}
           <button
             onClick={() => setOpen(!open)}
@@ -140,44 +196,57 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur">
           <div className="space-y-1 px-4 py-3">
-            {filteredMenu.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition
-                  ${
-                    pathname === item.href
+            {filteredMenu.map((item) => {
+              if ("children" in item && item.children) {
+                return (
+                  <div key={item.label}>
+                    <div className="px-3 py-2 text-sm font-semibold text-gray-600">
+                      {item.label}
+                    </div>
+
+                    <div className="ml-4 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setOpen(false)}
+                          className={`block rounded-md px-3 py-2 text-sm transition
+                ${pathname === child.href
+                              ? "bg-teal-50 text-teal-700"
+                              : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition
+        ${pathname === item.href
                       ? "bg-teal-50 text-teal-700"
                       : "text-gray-700 hover:bg-gray-100"
-                  }
-                  ${
-                    item.highlight
-                      ? "bg-rose-50 text-rose-700"
-                      : ""
-                  }
-                  ${
-                    item.admin
+                    }
+        ${item.highlight ? "bg-rose-50 text-rose-700" : ""
+                    }
+        ${item.admin
                       ? "border border-violet-200 text-teal-600 hover:bg-violet-50"
                       : ""
-                  }
-                `}
-              >
-                {item.highlight && (
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                  >
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v5l3 3" />
-                  </svg>
-                )}
-                {item.label}
-              </Link>
-            ))}
+                    }
+      `}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+
 
             {session?.user && (
               <button
