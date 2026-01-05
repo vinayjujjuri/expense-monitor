@@ -36,5 +36,5 @@ app.post("/api/parse-phonepe", upload.single("file"), async (req, res) => {
 });
 
 app.listen(4000, () =>
-  console.log("✅ PDF backend running on http://localhost:4000")
+  console.log("✅ Server is up and running on port 4000")
 );

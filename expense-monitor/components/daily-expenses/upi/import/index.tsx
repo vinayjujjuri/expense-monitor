@@ -19,7 +19,7 @@ export default function ImportUPIExpenses() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:4000/api/parse-phonepe", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_PDF_BACKEND_URL}/api/parse-phonepe`, {
         method: "POST",
         body: formData,
       });
