@@ -51,6 +51,8 @@ export default function ImportUPIExpenses() {
     alert("Expenses imported successfully")
   }
 
+  console.log(previewData,"previewData")
+
   return (
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-2">Import Expenses</h1>

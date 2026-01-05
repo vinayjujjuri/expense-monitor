@@ -1,63 +1,36 @@
-/**
- * Extract PhonePe transactions from text
- */
 function parsePhonePeText(text) {
-  const transactions = [];
+  const transactions = []
 
-  const blockRegex =
-    /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2},\s+\d{4}[\s\S]*?(?=(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2},|\Z)/g;
+  // Split by Date headings (Jan 02, 2026 etc.)
+  const blocks = text.split(
+    /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2},\s+\d{4}/g
+  )
 
-  let match;
-
-  while ((match = blockRegex.exec(text)) !== null) {
-    const block = match[0];
-
-    const date =
+  for (const block of blocks) {
+    const typeMatch = block.match(/\b(DEBIT|CREDIT)\b/)
+    const amountMatch = block.match(/₹\s?([\d,]+(?:\.\d+)?)/)
+    const partyMatch = block.match(
+      /(Paid to|Received from)\s+([A-Za-z0-9 .&-]+)/i
+    )
+    const utrMatch = block.match(/UTR No\.\s*(\d+)/)
+     const date =
       block.match(
         /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2},\s+\d{4}/
       )?.[0] || null;
 
-    const type = block.match(/\b(DEBIT|CREDIT)\b/)?.[1] || null;
-
-    const amount =
-      block.match(/₹\s?([\d,.]+)/)?.[1]?.replace(/,/g, "") || null;
-
-    const merchant =
-      block.match(/(Paid to|Received from)\s(.+?)(Transaction ID|UTR|$)/)?.[2]
-        ?.trim() || null;
-
-    const utr = block.match(/UTR No\.\s(\d+)/)?.[1] || null;
+    if (!typeMatch || !amountMatch) continue
 
     transactions.push({
       date,
-      type,
-      amount: amount ? Number(amount) : null,
-      merchant,
-      utr,
-    });
+      type: typeMatch[1].toLowerCase(),
+      amount: Number(amountMatch[1].replace(/,/g, "")),
+      counterparty: partyMatch ? partyMatch[2].trim() : null,
+      utr: utrMatch ? utrMatch[1] : null,
+      rawText: block.trim(),
+    })
   }
 
-  return transactions;
+  return transactions
 }
 
-/**
- * Extract rows from tables (if present)
- */
-function parseTables(tableResult) {
-  const rows = [];
-
-  for (const page of tableResult.pages || []) {
-    for (const table of page.tables || []) {
-      for (const row of table) {
-        rows.push(row);
-      }
-    }
-  }
-
-  return rows;
-}
-
-module.exports = {
-  parsePhonePeText,
-  parseTables,
-};
+module.exports = { parsePhonePeText }
