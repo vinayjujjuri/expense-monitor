@@ -18,14 +18,25 @@ export default function DailyExpensesComponent() {
   useEffect(() => {
     async function load() {
       setLoading(true);
+
       const res = await fetch("/api/analytics/daily", {
         credentials: "include",
+        cache: "no-store",
       });
+
+      if (!res.ok) {
+        setToday([]);
+        setYesterday([]);
+        setLoading(false);
+        return;
+      }
+
       const data = await res.json();
       setToday(data.today ?? []);
       setYesterday(data.yesterday ?? []);
       setLoading(false);
     }
+
     load();
   }, []);
 
@@ -44,5 +55,3 @@ export default function DailyExpensesComponent() {
     </div>
   );
 }
-
-
