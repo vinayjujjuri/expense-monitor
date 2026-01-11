@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
+import DebitCategory from "@/models/debitCategory";
 import { getServerSession } from "next-auth";
 import authOptions from "@/libs/auth";
 import mongoose from "mongoose";
@@ -20,17 +21,9 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = new mongoose.Types.ObjectId((session as any).user.id);
-
-    const todayRange = {
-      $gte: startOfToday(),
-      $lte: endOfToday(),
-    };
-
-    const yesterdayRange = {
-      $gte: startOfYesterday(),
-      $lte: endOfYesterday(),
-    };
+    const userId = new mongoose.Types.ObjectId(
+      (session as any).user.id
+    );
 
     const baseMatch = {
       userId,
@@ -40,17 +33,25 @@ export async function GET() {
     const [today, yesterday] = await Promise.all([
       Transaction.find({
         ...baseMatch,
-        transactionDate: todayRange,
+        transactionDate: {
+          $gte: startOfToday(),
+          $lte: endOfToday(),
+        },
       })
         .populate("categoryId", "name")
-        .sort({ transactionDate: -1 }),
+        .sort({ transactionDate: -1 })
+        .lean(),
 
       Transaction.find({
         ...baseMatch,
-        transactionDate: yesterdayRange,
+        transactionDate: {
+          $gte: startOfYesterday(),
+          $lte: endOfYesterday(),
+        },
       })
         .populate("categoryId", "name")
-        .sort({ transactionDate: -1 }),
+        .sort({ transactionDate: -1 })
+        .lean(),
     ]);
 
     return NextResponse.json({

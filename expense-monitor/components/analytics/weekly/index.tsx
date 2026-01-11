@@ -64,25 +64,15 @@ export default function WeeklyBarChart() {
     return <p className="text-center text-gray-500">Loading data...</p>;
   }
 
-  if (!hasAnyData) {
+  const renderData = () => {
+    if (!hasAnyData) {
     return (
       <div className="rounded-xl bg-white p-6 shadow text-center text-gray-500">
         No data available for the selected month.
       </div>
     );
-  }
-
-  return (
-    <div className="space-y-6">
-      <YearMonthSelector
-        year={year}
-        month={month}
-        onChange={(y, m) => {
-          setYear(y);
-          setMonth(m);
-        }}
-      />
-
+  } else {
+    return (
       <div className="rounded-xl bg-white p-4 shadow">
         <Bar
           data={{
@@ -126,6 +116,21 @@ export default function WeeklyBarChart() {
           }}
         />
       </div>
+    )
+  }
+  }
+
+  return (
+    <div className="space-y-6">
+      <YearMonthSelector
+        year={year}
+        month={month}
+        onChange={(y, m) => {
+          setYear(y);
+          setMonth(m);
+        }}
+      />
+      {renderData()}
     </div>
   );
 }
