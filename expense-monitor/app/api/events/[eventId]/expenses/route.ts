@@ -8,15 +8,20 @@ import authOptions from "@/libs/auth";
 /* ---------------- POST: Add Event Expense ---------------- */
 export async function POST(
   req: Request,
-  { params }: { params: { eventId: string } }
+  context: { params: Promise<{ eventId: string }> }
 ) {
   try {
     await connectDB();
 
-     const session = await getServerSession(authOptions as any);
-      if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions as any);
+    if (!session || !(session as any).user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
-    const { expenseName, amount, expenseDate, eventId } = await req.json();
+    // ✅ MUST await params
+    const { eventId } = await context.params;
+
+    const { expenseName, amount, expenseDate } = await req.json();
 
     if (!expenseName || !amount || !expenseDate) {
       return NextResponse.json(
@@ -35,7 +40,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("POST Event Expense error:", err);
+    console.error("Event Expense POST error:", err);
     return NextResponse.json(
       { message: "Failed to add expense" },
       { status: 500 }
@@ -52,30 +57,18 @@ export async function GET(
     await connectDB();
 
     const session = await getServerSession(authOptions as any);
-      if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    const { eventId } = await context.params;
-
-    if (!mongoose.Types.ObjectId.isValid(eventId)) {
-      return NextResponse.json(
-        { message: "Invalid eventId" },
-        { status: 400 }
-      );
+    if (!session || !(session as any).user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const userObjectId = new mongoose.Types.ObjectId(
-      (session as any).user.id
-    );
-    const eventObjectId = new mongoose.Types.ObjectId(eventId);
-
-    console.log("MATCHING eventId:", eventObjectId.toString());
-    console.log("MATCHING userId:", userObjectId.toString());
+    // ✅ MUST await params
+    const { eventId } = await context.params;
 
     const data = await EventExpense.aggregate([
       {
         $match: {
-          eventId: eventObjectId,
-          userId: userObjectId,
+          eventId: new mongoose.Types.ObjectId(eventId),
+          userId: new mongoose.Types.ObjectId((session as any).user.id),
         },
       },
       {
@@ -84,7 +77,6 @@ export async function GET(
             $dateToString: {
               format: "%Y-%m-%d",
               date: "$expenseDate",
-              timezone: "Asia/Kolkata", // ✅ IMPORTANT
             },
           },
           expenses: {
@@ -99,16 +91,12 @@ export async function GET(
       { $sort: { _id: -1 } },
     ]);
 
-    console.log("AGG RESULT:", data);
-
     return NextResponse.json(data);
   } catch (err) {
-    console.error("GET Event Expenses error:", err);
+    console.error("Event Expense GET error:", err);
     return NextResponse.json(
       { message: "Failed to fetch expenses" },
       { status: 500 }
     );
   }
 }
-
-
