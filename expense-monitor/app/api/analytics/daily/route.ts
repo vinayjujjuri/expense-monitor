@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
-import DebitCategory from "@/models/debitCategory";
 import { getServerSession } from "next-auth";
 import authOptions from "@/libs/auth";
 import mongoose from "mongoose";
-import {
-  startOfToday,
-  endOfToday,
-  startOfYesterday,
-  endOfYesterday,
-} from "date-fns";
+
+/**
+ * Returns IST start & end converted to UTC
+ */
+function getISTRange(offsetDays = 0) {
+  const now = new Date();
+
+  // IST offset = +5:30
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+
+  const ist = new Date(now.getTime() + istOffsetMs);
+  ist.setDate(ist.getDate() + offsetDays);
+  ist.setHours(0, 0, 0, 0);
+
+  const start = new Date(ist.getTime() - istOffsetMs);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+  return { start, end };
+}
 
 export async function GET() {
   try {
@@ -25,6 +37,9 @@ export async function GET() {
       (session as any).user.id
     );
 
+    const todayRange = getISTRange(0);
+    const yesterdayRange = getISTRange(-1);
+
     const baseMatch = {
       userId,
       type: "debit",
@@ -34,8 +49,8 @@ export async function GET() {
       Transaction.find({
         ...baseMatch,
         transactionDate: {
-          $gte: startOfToday(),
-          $lte: endOfToday(),
+          $gte: todayRange.start,
+          $lt: todayRange.end,
         },
       })
         .populate("categoryId", "name")
@@ -45,8 +60,8 @@ export async function GET() {
       Transaction.find({
         ...baseMatch,
         transactionDate: {
-          $gte: startOfYesterday(),
-          $lte: endOfYesterday(),
+          $gte: yesterdayRange.start,
+          $lt: yesterdayRange.end,
         },
       })
         .populate("categoryId", "name")
