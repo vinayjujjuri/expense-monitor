@@ -5,20 +5,19 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/libs/auth";
 import mongoose from "mongoose";
 
-/**
- * Returns IST start & end converted to UTC
- */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 function getISTRange(offsetDays = 0) {
   const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
 
-  // IST offset = +5:30
-  const istOffsetMs = 5.5 * 60 * 60 * 1000;
-
-  const ist = new Date(now.getTime() + istOffsetMs);
+  const ist = new Date(now.getTime() + istOffset);
   ist.setDate(ist.getDate() + offsetDays);
   ist.setHours(0, 0, 0, 0);
 
-  const start = new Date(ist.getTime() - istOffsetMs);
+  const start = new Date(ist.getTime() - istOffset);
   const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 
   return { start, end };
@@ -34,23 +33,23 @@ export async function GET() {
     }
 
     const userId = new mongoose.Types.ObjectId(
-      (session as any).user.id
-    );
+          (session as any).user.id
+        );
 
-    const todayRange = getISTRange(0);
-    const yesterdayRange = getISTRange(-1);
+    const today = getISTRange(0);
+    const yesterday = getISTRange(-1);
 
     const baseMatch = {
       userId,
       type: "debit",
     };
 
-    const [today, yesterday] = await Promise.all([
+    const [todayData, yesterdayData] = await Promise.all([
       Transaction.find({
         ...baseMatch,
         transactionDate: {
-          $gte: todayRange.start,
-          $lt: todayRange.end,
+          $gte: today.start,
+          $lt: today.end,
         },
       })
         .populate("categoryId", "name")
@@ -60,8 +59,8 @@ export async function GET() {
       Transaction.find({
         ...baseMatch,
         transactionDate: {
-          $gte: yesterdayRange.start,
-          $lt: yesterdayRange.end,
+          $gte: yesterday.start,
+          $lt: yesterday.end,
         },
       })
         .populate("categoryId", "name")
@@ -70,11 +69,11 @@ export async function GET() {
     ]);
 
     return NextResponse.json({
-      today,
-      yesterday,
+      today: todayData,
+      yesterday: yesterdayData,
     });
-  } catch (error) {
-    console.error("Daily analytics error:", error);
+  } catch (err) {
+    console.error("Daily analytics error:", err);
     return NextResponse.json(
       { message: "Failed to fetch daily expenses" },
       { status: 500 }
