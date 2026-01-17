@@ -4,6 +4,7 @@ import Transaction from "@/models/transaction";
 import { getServerSession } from "next-auth";
 import authOptions from "@/libs/auth";
 import mongoose from "mongoose";
+import "@/models/debitCategory";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
