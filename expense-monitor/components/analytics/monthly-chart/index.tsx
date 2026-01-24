@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
 import { Pie } from "react-chartjs-2"
 import { toTitleCase } from "@/utils/format"
+import Link from "next/link"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -27,7 +28,9 @@ export default function MonthlyPieChart() {
         setLoading(true)
         setError(null)
 
-        const res = await fetch("/api/analytics/monthly")
+        const res = await fetch("/api/analytics/monthly", {
+          cache: "no-store",
+        })
         if (!res.ok) throw new Error(`Request failed: ${res.status}`)
 
         const data = await res.json()
@@ -58,13 +61,20 @@ export default function MonthlyPieChart() {
 
   if (!categories.length) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow-sm">
+      <div className="p-5 bg-white rounded-xl shadow-md">
         <p className="text-sm text-gray-600">
           No debit data available for this month.
         </p>
         <p className="mt-2 text-xs text-gray-500">
           Total spent: ₹{total}
         </p>
+
+        <Link
+          href="/analytics/monthly"
+          className="inline-flex items-center mt-4 text-sm font-medium text-teal-600 hover:text-teal-700"
+        >
+          View monthly details →
+        </Link>
       </div>
     )
   }
@@ -74,21 +84,19 @@ export default function MonthlyPieChart() {
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash)
     }
-
     const hue = Math.abs(hash) % 360
     return `hsl(${hue}, 70%, 55%)`
   }
 
-
   const chartData = {
-    labels: categories.map((c:Category) => toTitleCase(c.name)),
+    labels: categories.map((c) => toTitleCase(c.name)),
     datasets: [
       {
-        label: "Monthly spending by category " + total,
+        label: "Monthly spending",
         data: categories.map((c) => c.amount),
         backgroundColor: categories.map((c) =>
-        stringToColor(c.name)
-      ),
+          stringToColor(c.name)
+        ),
         borderColor: "rgba(255,255,255,0.7)",
         borderWidth: 1,
       },
@@ -97,9 +105,20 @@ export default function MonthlyPieChart() {
 
   return (
     <div className="max-w-md mx-auto p-5 bg-white rounded-xl shadow-md">
-      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-        Monthly Spending
-      </h3>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-lg font-semibold text-gray-900">
+          Monthly Spending
+        </h3>
+
+        <Link
+          href="/monthly-details"
+          className="text-sm font-medium text-teal-600 hover:text-teal-700"
+        >
+          View details →
+        </Link>
+      </div>
+
       <p className="text-xs text-gray-500 mb-4">
         Category-wise debit distribution
       </p>
@@ -126,7 +145,8 @@ export default function MonthlyPieChart() {
       />
 
       <div className="mt-4 text-sm text-gray-700 font-medium text-center">
-        Total spent: <span className="text-rose-600">₹{total}</span>
+        Total spent:{" "}
+        <span className="text-rose-600">₹{total}</span>
       </div>
     </div>
   )

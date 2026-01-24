@@ -50,9 +50,11 @@ const menu: MenuItem[] = [
 
   {
     label: "UPI",
+    admin: true,
     children: [
       { label: "Upload Statement", href: "/upi/upload-phonePe-transactions" },
     ],
+    
   },
 
   { label: "Weekly Report", href: "/weekly-report" },
