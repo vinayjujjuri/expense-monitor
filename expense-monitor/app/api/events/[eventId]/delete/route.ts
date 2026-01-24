@@ -8,7 +8,7 @@ import authOptions from "@/libs/auth"
 
 export async function DELETE(
   _req: Request,
-  context: { params: { eventId: string } }
+  context: { params: Promise<{ eventId: string }> }
 ) {
   let session: mongoose.ClientSession | null = null
 
@@ -32,8 +32,8 @@ export async function DELETE(
       (authSession as any).user.id
     )
 
-    const params = await (context as any).params
-    const eventId = new mongoose.Types.ObjectId(params.eventId)
+    const { eventId: eventIdStr } = await context.params
+    const eventId = new mongoose.Types.ObjectId(eventIdStr)
 
     session.startTransaction()
 
