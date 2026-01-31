@@ -61,20 +61,25 @@ export default function MonthlyPieChart() {
 
   if (!categories.length) {
     return (
-      <div className="p-5 bg-white rounded-xl shadow-md">
-        <p className="text-sm text-gray-600">
-          No debit data available for this month.
-        </p>
-        <p className="mt-2 text-xs text-gray-500">
-          Total spent: ₹{total}
-        </p>
+      <div className="w-full max-w-md mx-auto p-4 sm:p-5 bg-white rounded-xl shadow-md">
+        <div className="text-center sm:text-left">
+          <p className="text-sm sm:text-base text-gray-600">
+            No debit data available for this month.
+          </p>
 
-        <Link
-          href="/analytics/monthly"
-          className="inline-flex items-center mt-4 text-sm font-medium text-teal-600 hover:text-teal-700"
-        >
-          View monthly details →
-        </Link>
+          <p className="mt-2 text-xs sm:text-sm text-gray-500">
+            Total spent: <span className="text-rose-600 font-medium">₹{total}</span>
+          </p>
+        </div>
+
+        <div className="mt-4 sm:mt-3 flex justify-center sm:justify-end">
+          <Link
+            href="/analytics/monthly"
+            className="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-700"
+          >
+            View monthly details →
+          </Link>
+        </div>
       </div>
     )
   }

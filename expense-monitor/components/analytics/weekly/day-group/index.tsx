@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { toTitleCase } from "@/utils/format";
 import { useState } from "react";
 
@@ -32,8 +33,15 @@ export default function DayGroup({ entries }: { entries: any[] }) {
     location.reload();
   }
 
+  // Confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"edit" | "delete" | null>(null);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pendingAmount, setPendingAmount] = useState<number | null>(null);
+
   return (
-    <div className="space-y-4">
+    <>
+      <div className="space-y-4">
       {Object.entries(grouped).map(([day, items]: any) => {
         const total = items.reduce(
           (s: number, i: any) => s + i.amount,
@@ -67,9 +75,19 @@ export default function DayGroup({ entries }: { entries: any[] }) {
                     />
                     <button
                       onClick={() => update(e._id)}
-                      className="text-teal-600 text-xs"
+                      className="px-2 py-1 rounded-md border border-teal-100 bg-teal-50 hover:bg-teal-100 text-teal-600 text-xs transition"
                     >
                       Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        // discard edits
+                        setEditingId(null);
+                        setAmount("");
+                      }}
+                      className="px-2 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-xs text-gray-600 transition"
+                    >
+                      Discard
                     </button>
                   </div>
                 ) : (
@@ -77,16 +95,24 @@ export default function DayGroup({ entries }: { entries: any[] }) {
                     <span>₹{e.amount}</span>
                     <button
                       onClick={() => {
-                        setEditingId(e._id);
-                        setAmount(String(e.amount));
+                        // open confirm for edit
+                        setPendingId(e._id);
+                        setPendingAmount(e.amount ?? null);
+                        setConfirmAction("edit");
+                        setConfirmOpen(true);
                       }}
-                      className="text-xs text-gray-500"
+                      className="px-2 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-xs text-gray-600 transition"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => remove(e._id)}
-                      className="text-xs text-red-500"
+                      onClick={() => {
+                        // open confirm for delete
+                        setPendingId(e._id);
+                        setConfirmAction("delete");
+                        setConfirmOpen(true);
+                      }}
+                      className="px-2 py-1 rounded-md border border-red-100 bg-red-50 hover:bg-red-100 text-xs text-red-600 transition"
                     >
                       Delete
                     </button>
@@ -97,6 +123,40 @@ export default function DayGroup({ entries }: { entries: any[] }) {
           </div>
         );
       })}
-    </div>
+      </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        title={confirmAction === "delete" ? "Delete entry" : "Edit entry"}
+        description={
+          confirmAction === "delete"
+            ? "This will permanently delete the expense. Are you sure?"
+            : "Start editing this expense? You can discard changes later."
+        }
+        danger={confirmAction === "delete"}
+        confirmLabel={confirmAction === "delete" ? "Delete" : "Edit"}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setConfirmAction(null);
+          setPendingId(null);
+          setPendingAmount(null);
+        }}
+        onConfirm={() => {
+          if (!pendingId) return;
+
+          if (confirmAction === "delete") {
+            // call remove
+            fetch(`/api/expenses/${pendingId}`, { method: "DELETE" }).then(() => location.reload());
+          } else if (confirmAction === "edit") {
+            setEditingId(pendingId);
+            setAmount(pendingAmount !== null ? String(pendingAmount) : "");
+          }
+
+          setConfirmOpen(false);
+          setConfirmAction(null);
+          setPendingId(null);
+          setPendingAmount(null);
+        }}
+      />
+    </>
   );
 }
