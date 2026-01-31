@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
+import "@/models/debitCategory";
 import mongoose from "mongoose";
 import { getServerSession } from "next-auth/next";
 import authOptions from "@/libs/auth";
