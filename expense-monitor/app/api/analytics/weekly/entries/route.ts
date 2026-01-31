@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/libs/db";
 import Transaction from "@/models/transaction";
 import mongoose from "mongoose";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import authOptions from "@/libs/auth";
 import { getLocalSundayWeekRange } from "@/utils/get-week-range";
 
@@ -11,24 +11,38 @@ export async function GET(req: Request) {
     await connectDB();
 
     const session = await getServerSession(authOptions as any);
-    if (!session || !(session as any).user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!session || !(session as any).user?.id) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
     }
+
+    const userId = (session as any).user.id;
 
     const { searchParams } = new URL(req.url);
-    const week = Number(searchParams.get("week"));
-    const month = Number(searchParams.get("month"));
-    const year = Number(searchParams.get("year"));
 
-    if (!week || !month || !year) {
-      return NextResponse.json({ message: "Missing params" }, { status: 400 });
-    }
+    const now = new Date();
 
-    const { startDate, endDate } = getLocalSundayWeekRange(week, month, year);
+    // ✅ Safe defaults for first page load
+    const week =
+      Number(searchParams.get("week")) ||
+      Math.ceil(now.getDate() / 7);
 
+    const month =
+      Number(searchParams.get("month")) ||
+      now.getMonth() + 1;
+
+    const year =
+      Number(searchParams.get("year")) ||
+      now.getFullYear();
+
+    // ✅ Local Sunday-based range (UTC-safe)
+    const { startDate, endDate } =
+      getLocalSundayWeekRange(week, month, year);
 
     const entries = await Transaction.find({
-      userId: new mongoose.Types.ObjectId((session as any).user.id),
+      userId: new mongoose.Types.ObjectId(userId),
       type: "debit",
       transactionDate: {
         $gte: startDate,
@@ -39,9 +53,9 @@ export async function GET(req: Request) {
       .sort({ transactionDate: -1 })
       .lean();
 
-
     return NextResponse.json(entries);
-  } catch (err) {
+  } catch (error) {
+    console.error("Weekly entries error:", error);
     return NextResponse.json(
       { message: "Failed to fetch weekly entries" },
       { status: 500 }

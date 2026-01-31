@@ -52,7 +52,7 @@ export default function MonthlyCategoryList() {
         </div>
 
         <Link
-          href="/monthly-details"
+          href="/"
           className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 sm:mt-0"
         >
           Go to Dashboard

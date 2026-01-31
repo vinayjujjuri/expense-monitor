@@ -12,8 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import YearMonthSelector from "../../year-month-selector";
 import { useSession } from "next-auth/react";
-import WeeklyEntriesComponent from "./entries";
-import WeeklyEntries from "./entries";
+import WeeklyAccordion from "./weekly-accordion";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -134,14 +133,7 @@ export default function WeeklyBarChart() {
       />
       {renderData()}
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((w) => (
-          <WeeklyEntries
-            key={w}
-            week={w}
-            month={month}
-            year={year}
-          />
-        ))}
+        <WeeklyAccordion month={month} year={year} />
 </div>
     </div>
   );
