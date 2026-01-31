@@ -109,19 +109,28 @@ export default function MonthlyPieChart() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-5 bg-white rounded-xl shadow-md">
+    <div className="w-full max-w-md mx-auto p-4 sm:p-5 bg-white rounded-xl shadow-md">
       {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="text-lg font-semibold text-gray-900">
+      <div className="flex flex-col sm:flex-row sm:items-center items-start justify-between mb-1 gap-3 sm:gap-0">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 text-center sm:text-left">
           Monthly Spending
         </h3>
 
-        <Link
-          href="/monthly-details"
-          className="text-sm font-medium text-teal-600 hover:text-teal-700"
-        >
-          View details →
-        </Link>
+        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap justify-center sm:justify-end">
+          <Link
+            href="/monthly-details"
+            className="text-sm sm:text-sm font-medium text-teal-600 hover:text-teal-700"
+          >
+            View details →
+          </Link>
+
+          <Link
+            href="/monthly-savings-summary"
+            className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs sm:text-sm font-medium rounded-md border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 transition"
+          >
+            Savings
+          </Link>
+        </div>
       </div>
 
       <p className="text-xs text-gray-500 mb-4">
