@@ -2,21 +2,15 @@
 
 import { useEffect, useState } from "react";
 import DayGroup from "../day-group";
+import { getLocalSundayWeekRange } from "@/utils/get-week-range";
 
 function getWeekLabel(week: number, month: number, year: number) {
-  const first = new Date(year, month - 1, 1);
-  const day = first.getDay(); // Sunday = 0
-  const firstSunday = new Date(first);
-  firstSunday.setDate(first.getDate() - day + (week - 1) * 7);
+  const { startDate, endDate } = getLocalSundayWeekRange(week, month, year);
 
-  const start = new Date(firstSunday);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-
-  return `${start.toLocaleDateString("en-IN", {
+  return `${startDate.toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
-  })} – ${end.toLocaleDateString("en-IN", {
+  })} – ${endDate.toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
   })}`;
@@ -47,7 +41,7 @@ export default function WeekRow({
 
   useEffect(() => {
     load();
-  }, []);
+  }, [week, month, year]);
 
   const total = entries.reduce(
     (sum, e) => sum + e.amount,
