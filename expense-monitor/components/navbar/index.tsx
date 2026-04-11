@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { DefaultSession } from "next-auth";
 import type {
@@ -28,8 +28,37 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [notificationCount, setNotificationCount] = useState<number>(0);
 
-  const notificationCount = 3;
+  // Fetch unread notification count for current user (admins fetch admin notifications)
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadCount() {
+      try {
+        const isAdmin = session?.user?.role === "admin";
+        const url = isAdmin ? "/api/notifications?forAdmin=true" : "/api/notifications";
+
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (!mounted) return;
+
+        const notifs = data.notifications ?? [];
+        const unread = notifs.filter((n: any) => !n.isRead).length;
+        setNotificationCount(unread);
+      } catch (e) {
+        // ignore errors for count
+      }
+    }
+
+    loadCount();
+
+    return () => {
+      mounted = false;
+    };
+  }, [session]);
 
   const menu: MenuItem[] = [
   { label: "New User", href: "/user-register", public: true },
@@ -65,9 +94,11 @@ function NotificationBell({
   mobile = false,
 }: NotificationBellProps) {
   return (
-    <button
+    <Link
       type="button"
+      href="/notifications"
       aria-label="Notifications"
+      
       className={`relative rounded-md p-2 transition cursor-pointer ${
         mobile
           ? "text-teal-600 hover:bg-teal-100"
@@ -92,7 +123,7 @@ function NotificationBell({
           {count > 99 ? "99+" : count}
         </span>
       )}
-    </button>
+    </Link>
   );
 }
 
