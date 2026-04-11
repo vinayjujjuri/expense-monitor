@@ -71,15 +71,6 @@ export default function MonthlyPieChart() {
             Total spent: <span className="text-rose-600 font-medium">₹{total}</span>
           </p>
         </div>
-
-        <div className="mt-4 sm:mt-3 flex justify-center sm:justify-end">
-          <Link
-            href="/analytics/monthly"
-            className="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-700"
-          >
-            View monthly details →
-          </Link>
-        </div>
       </div>
     )
   }
