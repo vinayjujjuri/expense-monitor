@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import YearlyLineChart from "@/components/analytics/yearly";
 import YearlyCategoryPieChart from "@/components/analytics/yearly/categories";
 import { headers } from "next/headers";
@@ -66,23 +67,39 @@ export default async function Page() {
   const monthlyTotals = yearly?.monthlyTotals ?? [];
   const categoryTotals = categories?.categories ?? [];
 
-  console.log("Yearly analytics data:", { monthlyTotals, categoryTotals });
-
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        Yearly Analytics — {year}
-      </h1>
+      <div className="mb-6 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-teal-600">
+              Yearly analytics
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+              Yearly Analytics — {year}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Explore your year-long spending trends and category breakdowns. Want a quick year-end financial summary? Open the yearly savings page.
+            </p>
+          </div>
+
+          <Link
+            href="/yearly-savings-summary"
+            className="inline-flex w-full items-center justify-center rounded-full bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 sm:w-auto"
+          >
+            View yearly savings summary
+          </Link>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <section className="bg-white p-4 rounded shadow">
+        <section className="bg-white p-4 rounded-3xl shadow-sm">
           <h2 className="text-lg font-medium mb-4">Monthly Spending</h2>
           <YearlyLineChart monthlyTotals={monthlyTotals} />
         </section>
 
-        <section className="bg-white p-4 rounded shadow">
+        <section className="bg-white p-4 rounded-3xl shadow-sm">
           <h2 className="text-lg font-medium mb-4">Category Breakdown</h2>
-
           {categoryTotals.length === 0 ? (
             <p className="text-sm text-gray-500">
               No categorized debit data available for this year.
