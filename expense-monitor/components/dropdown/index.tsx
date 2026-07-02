@@ -24,6 +24,7 @@ interface DropdownProps<T = unknown> {
   searchable?: boolean
   searchPlaceholder?: string
   emptyState?: React.ReactNode
+  listHoverColor?: string
 }
 
 export default function Dropdown<T = unknown>({
@@ -42,6 +43,7 @@ export default function Dropdown<T = unknown>({
   searchable = false,
   searchPlaceholder = "Search...",
   emptyState,
+  listHoverColor= "rose"
 }: DropdownProps<T>) {
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
@@ -222,7 +224,7 @@ export default function Dropdown<T = unknown>({
                   onClick={() => selectOption(opt)}
                   className={`flex items-center gap-2 px-3 py-2 cursor-pointer rounded-md ${
                     highlightedIndex === idx
-                      ? "bg-rose-50"
+                      ? `bg-${listHoverColor}-50`
                       : "hover:bg-gray-50"
                   } ${opt.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 >

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Dropdown from "@/components/dropdown";
+import YearlyCategoryPieChart from "@/components/analytics/yearly/categories";
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+type Category = { category: string | null; totalAmount: number };
 
 export default function YearlySavingsSummary() {
   const [year, setYear] = useState(currentYear);
   const [totalCredit, setTotalCredit] = useState(0);
   const [totalDebit, setTotalDebit] = useState(0);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,19 +25,31 @@ export default function YearlySavingsSummary() {
       setError(null);
 
       try {
-        const res = await fetch(`/api/analytics/yearly/summary?year=${year}`, {
-          cache: "no-store",
-        });
+        const [summaryRes, categoriesRes] = await Promise.all([
+          fetch(`/api/analytics/yearly/summary?year=${year}`, {
+            cache: "no-store",
+          }),
+          fetch(`/api/analytics/yearly/categories?year=${year}`, {
+            cache: "no-store",
+          }),
+        ]);
 
-        if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`);
+        if (!summaryRes.ok) {
+          throw new Error(`Summary request failed with status ${summaryRes.status}`);
         }
 
-        const data = await res.json();
+        if (!categoriesRes.ok) {
+          throw new Error(`Category request failed with status ${categoriesRes.status}`);
+        }
+
+        const summaryData = await summaryRes.json();
+        const categoryData = await categoriesRes.json();
+
         if (!mounted) return;
 
-        setTotalCredit(data.totalCredit ?? 0);
-        setTotalDebit(data.totalDebit ?? 0);
+        setTotalCredit(summaryData.totalCredit ?? 0);
+        setTotalDebit(summaryData.totalDebit ?? 0);
+        setCategories(categoryData.categories ?? []);
       } catch (err: any) {
         if (!mounted) return;
         setError(err?.message || "Unable to load yearly savings summary.");
@@ -48,34 +65,32 @@ export default function YearlySavingsSummary() {
   }, [year]);
 
   const savings = totalCredit - totalDebit;
+  const topCategories = categories.slice(0, 4);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Yearly Savings
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Yearly Savings</h1>
           <p className="mt-2 text-sm text-gray-600">
-            View total credit, debit, and net savings for the selected year.
+            View total credit, debit, net savings, and year-long spending by category.
           </p>
         </div>
 
         <div className="w-full max-w-xs">
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Select year
-          </label>
-          <select
+          <label className="mb-2 block text-sm font-medium text-gray-700">Select year</label>
+          <Dropdown
+            options={yearOptions.map((option) => ({
+              label: option.toString(),
+              value: option,
+            }))}
             value={year}
-            onChange={(event) => setYear(Number(event.target.value))}
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
-          >
-            {yearOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setYear(value as number)}
+            buttonClassName="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm transition focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+            placeholder="Select year"
+            showChevron={true}
+            listHoverColor="emerald"
+          />
         </div>
       </div>
 
@@ -124,6 +139,44 @@ export default function YearlySavingsSummary() {
                 ? "You don't have any savings this year."
                 : "Warning: expenses exceeded income for this year."}
             </div>
+
+            <section className="rounded-3xl border border-gray-200 bg-slate-50 p-6 shadow-sm">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Category wise expense distribution</h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    See which categories consumed most of your spending this year.
+                  </p>
+                </div>
+              </div>
+
+              {categories.length === 0 ? (
+                <div className="mt-6 rounded-3xl border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+                  No category data found for this year.
+                </div>
+              ) : (
+                <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+
+                  <div className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-slate-900">Top categories</h3>
+                    <div className="space-y-3">
+                      {topCategories.map((category, index) => (
+                        <div key={category.category ?? index} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm font-medium text-slate-900">
+                              {category.category ?? "Uncategorized"}
+                            </p>
+                            <p className="text-sm font-semibold text-slate-800">
+                              ₹{category.totalAmount.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
           </div>
         )}
       </div>
