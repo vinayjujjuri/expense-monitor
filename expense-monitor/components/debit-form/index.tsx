@@ -39,6 +39,14 @@ export function DebitForm() {
     fetchCategories()
   }, [])
 
+    useEffect(() => {
+    return () => {
+      if (successTimerRef.current) {
+        window.clearTimeout(successTimerRef.current)
+      }
+    }
+  }, [])
+
   function validate(): boolean {
     setError(null)
     const num = Number(amount)
@@ -94,13 +102,6 @@ export function DebitForm() {
     }
   }
 
-  useEffect(() => {
-    return () => {
-      if (successTimerRef.current) {
-        window.clearTimeout(successTimerRef.current)
-      }
-    }
-  }, [])
 
   const successComponent = () => {
     if(!success) return null
@@ -129,8 +130,8 @@ export function DebitForm() {
     )
   };
 
-  return (
-    <form onSubmit={handleSubmit} aria-label="debit-form" className="w-full max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
+  const headerComponent = () => {
+    return (
       <div className="flex items-start gap-3 mb-4">
         <div className="flex-shrink-0">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-rose-600">
@@ -143,7 +144,91 @@ export function DebitForm() {
           <p className="text-sm text-gray-500">Record outgoing money — bills, shopping, travel.</p>
         </div>
       </div>
+    )
+  };
 
+  const noDebitFoundComponent = () => {
+    return (
+      <div className="rounded-lg border border-dashed border-rose-300 bg-rose-50 p-4">
+        <p className="text-sm text-rose-700 font-medium">
+          No debit types found
+        </p>
+        <p className="mt-1 text-xs text-gray-600">
+          You need at least one debit type before adding expenses.
+        </p>
+
+        <a
+          href="/manage-debit-types"
+          className="mt-3 inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+        >
+          ➕ Add Debit Type
+        </a>
+      </div>
+    )
+  };
+
+  const debitsCategoryDropdownComponent = () => {
+    return (
+      <div>
+        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Debit Type</label>
+        <Dropdown
+          id="type"
+          options={categories.map(cat => ({
+            label: toTitleCase(cat.name),
+            value: cat._id,
+          }))}
+          value={categoryId}
+          onChange={(v: any) => setCategoryId(v)}
+          placeholder="Select category"
+          className="w-full"
+          buttonClassName="w-full rounded-md border border-gray-200 px-3 py-2 bg-white text-gray-900 text-left"
+          listStyle={{ minWidth: '100%' }}
+          searchable={true}
+          searchPlaceholder="Search for your Debit type"
+          emptyState={
+            <div className="flex flex-col gap-2 p-2">
+              <p className="text-sm text-gray-600">
+                No debit type found
+              </p>
+              <a
+                href="/manage-debit-types"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
+              >
+                ➕ Add Debit Type
+              </a>
+            </div>
+          }
+        />
+      </div>
+    )
+  };
+
+  const submitButtonComponent = () => {
+    return (
+      <div className="flex items-center justify-end">
+        <button
+          type="submit"
+          disabled={loading || categories.length === 0}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md disabled:opacity-60"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" className="opacity-75" />
+              </svg>
+              <span>Saving...</span>
+            </>
+          ) : (
+            <span>Add Debit</span>
+          )}
+        </button>
+      </div>
+    )
+  };
+
+  const userInputFieldsComponent = () => {
+    return (
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
@@ -165,74 +250,18 @@ export function DebitForm() {
         </div>
 
         {categories.length === 0 ?
-          <div className="rounded-lg border border-dashed border-rose-300 bg-rose-50 p-4">
-            <p className="text-sm text-rose-700 font-medium">
-              No debit types found
-            </p>
-            <p className="mt-1 text-xs text-gray-600">
-              You need at least one debit type before adding expenses.
-            </p>
-
-            <a
-              href="/manage-debit-types"
-              className="mt-3 inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
-            >
-              ➕ Add Debit Type
-            </a>
-          </div> :
-          <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Debit Type</label>
-          <Dropdown
-            id="type"
-            options={categories.map(cat => ({
-              label: toTitleCase(cat.name),
-              value: cat._id,
-            }))}
-            value={categoryId}
-            onChange={(v: any) => setCategoryId(v)}
-            placeholder="Select category"
-            className="w-full"
-            buttonClassName="w-full rounded-md border border-gray-200 px-3 py-2 bg-white text-gray-900 text-left"
-            listStyle={{ minWidth: '100%' }}
-            searchable={true}
-            searchPlaceholder="Search for your Debit type"
-            emptyState={
-              <div className="flex flex-col gap-2 p-2">
-                  <p className="text-sm text-gray-600">
-                    No debit type found
-                  </p>
-                  <a
-                    href="/manage-debit-types"
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
-                  >
-                    ➕ Add Debit Type
-                  </a>
-              </div>
-            }
-          />
-        </div>
+          noDebitFoundComponent() :
+          debitsCategoryDropdownComponent()
         }
-        <div className="flex items-center justify-end">
-          <button
-            type="submit"
-            disabled={loading || categories.length === 0}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md disabled:opacity-60"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
-                  <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" className="opacity-75" />
-                </svg>
-                <span>Saving...</span>
-              </>
-            ) : (
-              <span>Add Debit</span>
-            )}
-          </button>
-        </div>
+        {submitButtonComponent()}
       </div>
+    )
+  };
 
+  return (
+    <form onSubmit={handleSubmit} aria-label="debit-form" className="w-full max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
+      {headerComponent()}
+      {userInputFieldsComponent()}
       {errorComponent()}
       {successComponent()}
     </form>

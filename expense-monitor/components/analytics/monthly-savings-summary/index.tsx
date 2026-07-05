@@ -32,6 +32,65 @@ export default function MonthlySavingsSummary() {
 
   const savings = totalCredit - totalDebit;
 
+  const totalCreditComponent = () => {
+    return (
+      <div className="rounded-lg bg-emerald-50 p-4 text-center">
+        <p className="text-xs text-emerald-700">
+          Total Credit
+        </p>
+        <p className="text-xl font-bold text-emerald-800">
+          ₹{totalCredit.toLocaleString()}
+        </p>
+      </div>
+    )
+  };
+
+  const totalDebitComponent = () => {
+    return (
+      <div className="rounded-lg bg-rose-50 p-4 text-center">
+        <p className="text-xs text-rose-700">
+          Total Debit
+        </p>
+        <p className="text-xl font-bold text-rose-800">
+          ₹{totalDebit.toLocaleString()}
+        </p>
+      </div>
+    )
+  };
+
+  const savingComponent = () => {
+    return (
+      <div
+        className={`rounded-lg p-4 text-center ${savings >= 0
+            ? "bg-teal-50"
+            : "bg-orange-50"
+          }`}
+      >
+        <p className="text-xs text-gray-600">
+          Net Savings
+        </p>
+        <p
+          className={`text-xl font-bold ${savings >= 0
+              ? "text-teal-700"
+              : "text-orange-700"
+            }`}
+        >
+          ₹{savings.toLocaleString()}
+        </p>
+      </div>
+    )
+  };
+
+  const savingInfoTextComponent = () => {
+    return (
+      <div className="mt-4 text-center text-sm text-gray-600">
+        {savings >= 0
+          ? "🎉 Good job! You saved money this month."
+          : "⚠️ You spent more than you earned this month."}
+      </div>
+    )
+  };
+
   return (
     <div className="space-y-4">
       {/* Selector */}
@@ -61,54 +120,17 @@ export default function MonthlySavingsSummary() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Credit */}
-              <div className="rounded-lg bg-emerald-50 p-4 text-center">
-                <p className="text-xs text-emerald-700">
-                  Total Credit
-                </p>
-                <p className="text-xl font-bold text-emerald-800">
-                  ₹{totalCredit.toLocaleString()}
-                </p>
-              </div>
+              {totalCreditComponent()}
 
               {/* Debit */}
-              <div className="rounded-lg bg-rose-50 p-4 text-center">
-                <p className="text-xs text-rose-700">
-                  Total Debit
-                </p>
-                <p className="text-xl font-bold text-rose-800">
-                  ₹{totalDebit.toLocaleString()}
-                </p>
-              </div>
+              {totalDebitComponent()}
 
               {/* Savings */}
-              <div
-                className={`rounded-lg p-4 text-center ${
-                  savings >= 0
-                    ? "bg-teal-50"
-                    : "bg-orange-50"
-                }`}
-              >
-                <p className="text-xs text-gray-600">
-                  Net Savings
-                </p>
-                <p
-                  className={`text-xl font-bold ${
-                    savings >= 0
-                      ? "text-teal-700"
-                      : "text-orange-700"
-                  }`}
-                >
-                  ₹{savings.toLocaleString()}
-                </p>
-              </div>
+              {savingComponent()}
             </div>
 
             {/* Insight */}
-            <div className="mt-4 text-center text-sm text-gray-600">
-              {savings >= 0
-                ? "🎉 Good job! You saved money this month."
-                : "⚠️ You spent more than you earned this month."}
-            </div>
+            {savingInfoTextComponent()}
           </>
         )}
       </div>

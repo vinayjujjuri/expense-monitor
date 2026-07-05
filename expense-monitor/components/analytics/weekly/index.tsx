@@ -67,58 +67,58 @@ export default function WeeklyBarChart() {
 
   const renderData = () => {
     if (!hasAnyData) {
-    return (
-      <div className="rounded-xl bg-white p-6 shadow text-center text-gray-500">
-        No data available for the selected month.
-      </div>
-    );
-  } else {
-    return (
-      <div className="rounded-xl bg-white p-4 shadow">
-        <Bar
-          data={{
-            labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-            datasets: [
-              {
-                label: "Weekly Expenses",
-                data: weeklyDebit,
-                backgroundColor: [
-                  "rgba(20, 184, 166, 0.7)",
-                  "rgba(56, 189, 248, 0.7)",
-                  "rgba(99, 102, 241, 0.7)",
-                  "rgba(168, 85, 247, 0.7)",
-                  "rgba(34, 197, 94, 0.7)",
-                ],
-                borderRadius: 6,
-                barThickness: 40,
-              },
-            ],
-          }}
-          options={{
-            responsive: true,
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: (ctx) =>
-                    `Debit: ₹${ctx.raw} | Monthly Credit: ₹${totalCredit}`,
+      return (
+        <div className="rounded-xl bg-white p-6 shadow text-center text-gray-500">
+          No data available for the selected month.
+        </div>
+      );
+    } else {
+      return (
+        <div className="rounded-xl bg-white p-4 shadow">
+          <Bar
+            data={{
+              labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+              datasets: [
+                {
+                  label: "Weekly Expenses",
+                  data: weeklyDebit,
+                  backgroundColor: [
+                    "rgba(20, 184, 166, 0.7)",
+                    "rgba(56, 189, 248, 0.7)",
+                    "rgba(99, 102, 241, 0.7)",
+                    "rgba(168, 85, 247, 0.7)",
+                    "rgba(34, 197, 94, 0.7)",
+                  ],
+                  borderRadius: 6,
+                  barThickness: 40,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) =>
+                      `Debit: ₹${ctx.raw} | Monthly Credit: ₹${totalCredit}`,
+                  },
                 },
               },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: totalCredit || undefined,
-                title: {
-                  display: true,
-                  text: "Amount",
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  max: totalCredit || undefined,
+                  title: {
+                    display: true,
+                    text: "Amount",
+                  },
                 },
               },
-            },
-          }}
-        />
-      </div>
-    )
-  }
+            }}
+          />
+        </div>
+      )
+    }
   }
 
   return (
@@ -134,7 +134,7 @@ export default function WeeklyBarChart() {
       {renderData()}
       <div className="space-y-4">
         <WeeklyAccordion month={month} year={year} />
-</div>
+      </div>
     </div>
   );
 }
